@@ -15,9 +15,9 @@ services:
    - '/srv/gitlab/data:/var/opt/gitlab'
  Gitlab_Runner:
   container_name: Gitlab_Runner
-  image: 'gitlab/gitlab-runner:ubuntu-v10.1.0'
+  image: 'gitlab/gitlab-runner:v10.1.0'
   networks:
-   - 'DockerLAN'  
+   - 'DockerLAN'
   restart: always
   volumes:
    - '/var/run/docker.sock:/var/run/docker.sock'
