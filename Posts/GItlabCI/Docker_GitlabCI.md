@@ -53,12 +53,11 @@ networks:
  DockerLAN:
   driver: bridge
 ```
+!
 
-Vamos ler cada passo do nosso compose:
+__EXPLICAR OS STEPS DO COMPOSE__ 
 
-*
-*
-*
+!
 
 Concluída a execução, você terá o retorno do compose como OK informando que os contâineres foram criados. Digite ```docker container ls``` e você verá que o contâiner do Gitlab Runner já está rodando e o do Gitlab CI está sendo iniciado ```(health: starting)```, como na imagem abaixo:
 
@@ -66,8 +65,85 @@ Concluída a execução, você terá o retorno do compose como OK informando que
 
 Aguarde mais alguns minutos para que todo serviço seja configurado e execute mais uma vez comando do ```ls``` para conferir se o status do contâiner está como ```(healthy)``` (pode demorar em torno de 10 minutos). Quando estiver ```healthy``` abra o seu navegador e digite ```localhost:80```, sendo 80 a porta que foi exposta para acesso. Caso você tenha utilizado outra porta e não lembra qual, no terminal execute o ```docker container ls``` e veja a porta exposta, conforme no destaque da imagem abaixo:
 
+![Porta de Acesso](Images/port_expose.png)
+
+## Primeiro acesso ao Gitlab CE
+
+No seu primeiro acesso ele irá solicitar a nova senha para o usuário "root", digite uma de sua preferência. Logo em seguida ele irá te redirecionar a página de login da plataforma, digite o usuário "root" e a senha que você definiu na página anterior.
+
+Agora que já acessamos nosso Gitlab, precisamos configurar o Gitlab Runner para que possamos começar a fazer o upload dos projetos e a brincar com lab. Na parte superior do Gitlab, clique no icone de configuração (exemplo na imagem abaixo)
+
+![Acesso as configs do Gitlab CE](Images/config_gitlab.png)
+
+E na página de configurações, do lado esquerdo, clique na opção "Runners"
+
+![Config Runners](Images/config_runner.png)
+
+Ao acessar a página veja que não temos nenhum Runner configurado, então vamos configura-lo também utilizando os comandos via Docker :)
+
+Abra o terminal e digite:
+
+```
+docker exec -i -t Gitlab_Runner sudo gitlab-runner register
+```
+
+Ele irá apresentar a mensagem abaixo dando inicio a configuração do Runner. O primeiro passo é informar a URL do Gitlab, então digite o hostname do serviço como está descito no exemplo abaixo e aperte Enter:
+
+```
+Please enter the gitlab-ci coordinator URL (e.g. https://gitlab.com/):
+http://gitlab.machine.com/
+```
+
+O próximo passo é informar o Registration Token. Para copia-lo, vá na página dos Runners no Gitlab e copie a chave disponivel na tela (exemplo abaixo), cole no terminal e pressione enter:
+
+![Config Runner CMD](Images/config_runner2.png)
+
+Apos informar o Token, ele irá solicitar a descrição do Runner, digite a sua preferencia, conforme imagem mostra:
+
+```
+Please enter the gitlab-ci description for this runner:
+[ebce76428bsb]: runner_gitlab
+```
+
+Logo em seguida ele irá soliciar a Tag para esse Runner. É um passo muito importante pois é com essa Tag que você irá utilizar nos jobs de suas pipelines para que eles funcionem corretamente. Pode se usar a opção para que elas funcionem sem ela, mas vamos utiliza-la, já que é um processo mais detalhado e de muita importancia se conhecer. Descreva uma Tag fácil de se identificar, veja o exemplo:
+
+```
+Please enter the gitlab-ci tags for this runner (comma separated):
+runner01
+```
+
+Após "_taggear_" o Runner, temos de indicar se ele poderá executar jobs não "_taggeados_" e se vamos travar o Runner apenas em 1 projeto. Vamos configurar para que os jobs sem Tags não sejam executados e deixar o runner compartilhado, assim todos os projetos que tiverem com a Tag ```runner01``` configurada, serão executados.
+
+```
+Whether to run untagged build [true/false]
+[true]: false
+whether to lock the Runner to current projeto [true/false]
+[true]: false
+```
+
+Assim que essas informações forem adicionadas, o Register irá retornar uma mensagem informando que o registro foi efetuado com sucesso e a ID do Runner criado:
+
+```
+Registering runner... succeeded                     runner=QafK9ZCP
+```
+
+E para finalizar o processo, vamos indicar qual executor do Runner iremos utilizar e a imagem padrão a ser utilizada. No caso iremos utilizar o executor Docker e a uma imagem do alpine:3.5. Essa imagem padrão será utilizada caso não seja especificada nenhuma na execução do job na pipeline.
+
+O executor Docker permite que você execute cada job em um contâiner separado e isolado com uma imagem pré-definida em seu ```.gitlab-ci.yml```
+
+```
+Please enter the executor: docker-ssh, parallels, kubernetes, docker-ssh+machine, docker, shell, ssh, virtualbox, docker+machine:
+docker
+Please enter the dafault Docker image (e.g. ruby:2.1):
+alpine:3.5
+```
+
+Mais informações sobre os outros executores do Gitlab CI, [clique aqui](https://docs.gitlab.com/runner/executors/README.html)
 
 
-Explicar a prática de "taggear" as imagens.
 
-Colocar explicação de cada passo da execução acima.
+
+
+<!-- Explicar a prática de "taggear" as imagens. -->
+
+<!-- Colocar explicação de cada passo da execução acima. -->
