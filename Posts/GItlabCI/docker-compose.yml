@@ -6,7 +6,7 @@ services:
   networks: 
    - 'DockerLAN'
   restart: always
-  hostname: 'gitlab.machine'
+  hostname: 'gitlab.docker'
   ports:
    - '80:80'
   volumes:
