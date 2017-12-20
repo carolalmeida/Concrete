@@ -1,10 +1,10 @@
-
 # Gitlab + CI = GitlabCI
+
 ## Um poderoso repositório de códigos e Continuous Integration
 
 Todos nós da comunidade de desenvolvedores conhecemos várias plataformas de repositórios e Continuous Integration, cada uma com seus devidos destaques, e boa parte do mercado acaba selecionando uma plataforma para cada um deles (repositório e CI), fazendo com que haja um trabalho a mais para que a integração entre esses 2 estejam completas e bem refinadas para poderem ser utilizadas pelo seus times.
 
-Mas porque não usar uma ferramenta que una esses 2 serviços? 
+Mas porque não usar uma ferramenta que una esses 2 serviços?
 
 ### Montando seu próprio Gitlab CI com Docker
 
@@ -12,19 +12,21 @@ Para criar nosso lab iremos utilizar a última versão disponível, a v10.1. Cas
 
 Agora abra o seu terminal a faça do download da imagem do Gitlab CE (Community Edition)
 
-```
+```docker
 docker pull gitlab/gitlab-ce:10.1.4-ce.0
 ```
 
 O download é um pouco demorado. Após a sua conclusão, inicie o download do runner do GitlabCI com o comando abaixo. Veja que iremos utilizar também a versão 10 do Runner, pois se formos utilizar uma versão diferente do Gitlab CE que baixamos, há grande chances de haver incompatibilidades.
 
-```
+```docker
 gitlab/gitlab-runner:ubuntu-v10.1.0
 ```
-Feito os download vamos iniciar o processo de criação dos contâiners. Cria uma pasta em algum diretório com o nome GitlabCI e dentro dele crie o arquivo ```docker-compose.yml```.
-Feito os downloads, suba os 2 containers utilizando o Docker Compose abaixo para facilitar a tarefa. Caso tenha duvidas sobre o docker compose, sua instalação e utilização, [clique aqui](https://docs.docker.com/compose/install/).
 
-```
+Feito os download vamos iniciar o processo de criação dos contâiners. Crie uma pasta em algum diretório com o nome GitlabCI e dentro dele crie o arquivo ```docker-compose.yml``` e adicione as informações abaixo. Essa é a receita que irá subir os contâiners, dar um hostname ao Gitlab CI, configurar a network deles e a persistência nos volumes
+
+Caso tenha duvidas sobre o docker compose, sua instalação e utilização, [clique aqui](https://docs.docker.com/compose/install/).
+
+```yaml
 version: '3'
 services:
  Gitlab_CI:
@@ -33,7 +35,7 @@ services:
   networks: 
    - 'DockerLAN'
   restart: always
-  hostname: 'gitlab.machine'
+  hostname: 'gitlab.docker'
   ports:
    - '80:80'
   volumes:
@@ -83,13 +85,13 @@ Ao acessar a página veja que não temos nenhum Runner configurado, então vamos
 
 Abra o terminal e digite:
 
-```
+```docker
 docker exec -i -t Gitlab_Runner sudo gitlab-runner register
 ```
 
 Ele irá apresentar a mensagem abaixo dando inicio a configuração do Runner. O primeiro passo é informar a URL do Gitlab, então digite o hostname do serviço como está descito no exemplo abaixo e aperte Enter:
 
-```
+```gitlab-runner output
 Please enter the gitlab-ci coordinator URL (e.g. https://gitlab.com/):
 http://gitlab.machine.com/
 ```
@@ -100,21 +102,21 @@ O próximo passo é informar o Registration Token. Para copia-lo, vá na página
 
 Apos informar o Token, ele irá solicitar a descrição do Runner, digite a sua preferencia, conforme imagem mostra:
 
-```
+```gitlab-runner output
 Please enter the gitlab-ci description for this runner:
 [ebce76428bsb]: runner_gitlab
 ```
 
 Logo em seguida ele irá soliciar a Tag para esse Runner. É um passo muito importante pois é com essa Tag que você irá utilizar nos jobs de suas pipelines para que eles funcionem corretamente. Pode se usar a opção para que elas funcionem sem ela, mas vamos utiliza-la, já que é um processo mais detalhado e de muita importancia se conhecer. Descreva uma Tag fácil de se identificar, veja o exemplo:
 
-```
+```gitlab-runner output
 Please enter the gitlab-ci tags for this runner (comma separated):
 runner01
 ```
 
 Após "_taggear_" o Runner, temos de indicar se ele poderá executar jobs não "_taggeados_" e se vamos travar o Runner apenas em 1 projeto. Vamos configurar para que os jobs sem Tags não sejam executados e deixar o runner compartilhado, assim todos os projetos que tiverem com a Tag ```runner01``` configurada, serão executados.
 
-```
+```gitlab-runner output
 Whether to run untagged build [true/false]
 [true]: false
 whether to lock the Runner to current projeto [true/false]
@@ -123,7 +125,7 @@ whether to lock the Runner to current projeto [true/false]
 
 Assim que essas informações forem adicionadas, o Register irá retornar uma mensagem informando que o registro foi efetuado com sucesso e a ID do Runner criado:
 
-```
+```gitlab-runner output
 Registering runner... succeeded                     runner=QafK9ZCP
 ```
 
@@ -131,7 +133,7 @@ E para finalizar o processo, vamos indicar qual executor do Runner iremos utiliz
 
 O executor Docker permite que você execute cada job em um contâiner separado e isolado com uma imagem pré-definida em seu ```.gitlab-ci.yml```
 
-```
+```gitlab-runner output
 Please enter the executor: docker-ssh, parallels, kubernetes, docker-ssh+machine, docker, shell, ssh, virtualbox, docker+machine:
 docker
 Please enter the dafault Docker image (e.g. ruby:2.1):
