@@ -12,20 +12,19 @@ Para criar nosso lab iremos utilizar a última versão disponível, a v10.1. Cas
 
 Agora abra o seu terminal a faça do download da imagem do Gitlab CE (Community Edition)
 
-```docker
+```terminal
 docker pull gitlab/gitlab-ce:10.1.4-ce.0  restart: always
-
 ```
 
 O download é um pouco demorado. Após a sua conclusão, inicie o download do runner do GitlabCI com o comando abaixo. Veja que iremos utilizar também a versão 10 do Runner, pois se formos utilizar uma versão diferente do Gitlab CE que baixamos, há grande chances de haver incompatibilidades.
 
-```docker
-gitlab/gitlab-runner:ubuntu-v10.1.0
+```terminal
+docker pull gitlab/gitlab-runner:ubuntu-v10.1.0
 ```
 
-Feito os download vamos iniciar o processo de criação dos contâiners. Crie uma pasta em algum diretório com o nome GitlabCI e dentro dele crie o arquivo ```docker-compose.yml``` e adicione as informações abaixo. Essa é a receita que irá subir os contâiners, dar um hostname ao Gitlab CI, configurar a network deles e a persistência nos volumes
+Feito os download vamos iniciar o processo de criação dos contâiners. Crie uma pasta em algum diretório com o nome GitlabCI e dentro dele crie o arquivo ```docker-compose.yml``` e adicione as informações abaixo e salve o arquivo. Essa é a receita que irá subir os contâiners, dar um hostname ao Gitlab CI, configurar a network deles e a persistência nos volumes
 
-Caso tenha duvidas sobre o docker compose, sua instalação e utilização, [clique aqui](https://docs.docker.com/compose/install/).
+_Caso não tenha o Docker-Compose em sua máquina, sua instalação e utilização estão disponíveis [aqui](https://docs.docker.com/compose/install/) nessa documentação oficial do Docker. E mais informações sobre o quão "bão" é o Compose, você também pode ler [esse post](https://www.concrete.com.br/2017/12/11/docker-compose-o-que-e-para-que-serve-o-que-come/) em nosso blog._
 
 ```yaml
 version: '3'
@@ -63,7 +62,7 @@ __EXPLICAR OS STEPS DO COMPOSE__
 
 !
 
-Concluída a execução, você terá o retorno do compose como OK informando que os contâineres foram criados. Digite ```docker container ls``` e você verá que o contâiner do Gitlab Runner já está rodando e o do Gitlab CI está sendo iniciado ```(health: starting)```, como na imagem abaixo:
+Agora que temos nosso ```docker-compose.yml``` criado, ainda na pasta do projeto, digit e ```docker-compose up -d``` e você terá o retorno do compose como OK informando que os contâineres foram criados. Digite ```docker container ls``` e você verá que o contâiner do Gitlab Runner já está rodando e o do Gitlab CI está sendo iniciado ```(health: starting)```, como na imagem abaixo:
 
 ![Status](Images/gitlab_starting.png)
 
@@ -131,7 +130,7 @@ E para concluir o registro, vamos indicar qual executor do Runner iremos utiliza
 
 O executor Docker permite que você execute cada job em um contâiner separado e isolado com uma imagem pré-definida em seu ```.gitlab-ci.yml```
 
-```terminal
+```bash
 Please enter the executor: docker-ssh, parallels, kubernetes, docker-ssh+machine, docker, shell, ssh, virtualbox, docker+machine:
 docker
 Please enter the dafault Docker image (e.g. ruby:2.1):
@@ -144,7 +143,7 @@ Agora retorne ao Gitlab e veja que seu novo Runner está ativo
 
 ![Config Runner CMD](Images/runner_configured.png)
 
-Mas antes de finalizarmos, temos de fazer mais alguns ajustes dentro do Runner para que ele consiga identificar o Gitlab e fazer o pull dos projetos. Acesse o container do Gitlab Runner com o comando ```docker container exec -t -i Gitlab_Runner /bin/bash``` e navegue até a pasta ```/etc/gitlab-runner```. Nela terá o arquivo ```config.toml```, edite ele conforme a instrução abaixo:
+Mas antes de finalizarmos, temos de fazer mais alguns ajustes dentro do Runner para que ele consiga identificar o Gitlab e fazer o pull dos projetos. Acesse o container do Gitlab Runner com o comando ```docker container exec -t -i Gitlab_Runner /bin/bash``` e navegue até a pasta ```/etc/gitlab-runner```. Nela terá o arquivo ```config.toml```, edite ele adicionando o campo ```extra_hosts``` conforme o exemplo abaixo, onde do lado esquerdo é o hostname informado no .gitlab-ci.yml e do lado direito o ip de sua máquina ou alguma outra máquina que o Docker seja o host:
 
 ```toml
 concurrent = 1
@@ -166,13 +165,83 @@ check_interval = 0
   [runners.cache]
 
 ```
-Observe que no campo ```extra_hosts``` 
 
-Agora que temos o nosso Gitlab CI "de pé" e com o Runner ativo, bora subir um projeto nele e criarmos nossa pipeline.
+É necessária a configuração desse ```extra_hosts``` se não no momento que o Runner executar o job ele não irá encontrar o container do Gitlab CI informado.
+
+Agora que temos o nosso Gitlab CI "de pé" e o Runner está ativo e configurado, bora subir um projeto nele e criarmos nossa pipeline.
+
+Para facilitar o processo, fiz uma cópia de um projeto muito utilizado no Github e reduzi alguns arquivos dele. Acesse o projeto [clicando aqui](https://gitlab.com/cs-leandro-lourenco/spring-petclinic.git) e faça o clone.
+
+Agora acesse a pasta do projeto e remova a pasta .git usando o comando ```rm -r .git``` .
+
+Perfeito, mas antes de subirmos o projeto vamos criar o repositório remoto em nosso Gitlab CI no Docker. Acesse a url criada e na barra superior no canto direito, clique no icone de +, conforme a imagem abaixo:
+
+![Config Project](Images/config_project.png)
+
+E na seleção que irá abrir, clique em ```New Project```. Dê um nome ao projeto, no caso podemos utilizar o mesmo nome spring-petclinic, e clique no botão ```Create project```. Pronto agora vamos voltar a pasta do projeto Petclinic para conectarmos ao repo remoto e construirmos nossa pipeline como código.
+
+Dentro do repo, faça a conexão da pasta com o repositório utilizando os comandos abaixo
+
+```git
+git init
+git remote add origin <url_do_repo>
+git add .
+git commit -m "Initial commit"
+git push -u origin master
+```
+
+Pronto! Temos nosso projeto conectado e já com o primeiro commit feito.
+
+Vamos agora a pipeline.
+
+O ```.gitlab-ci-yml```
+
+```yml
+variables:
+  # This will supress any download for dependencies and plugins or upload messages which would clutter the console log.
+  # `showDateTime` will show the passed time in milliseconds. You need to specify `--batch-mode` to make this work.
 
 
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
+  
+  # As of Maven 3.3.0 instead of this you may define these options in `.mvn/maven.config` so the same config is used
+  # when running from the command line.
+  # `installAtEnd` and `deployAtEnd` are only effective with recent version of the corresponding plugins.
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
 
+cache:
+  paths:
+    - .m2/repository
 
+# Bloco de stages. São as fases da pipeline, e um stage pode conter mais de 1 job executando simultaneamente 
+stages:
+  - build
+  - test
+
+#1 Stage de build
+build:
+  image: maven:3.5.2-jdk-8
+  stage: build
+  tags:
+    - runner01
+  script:
+    - echo -e "\n Build da aplicação. \n"
+    - mvn $MAVEN_CLI_OPTS package
+  artifacts:
+    paths:
+      - target/*spring-petclinic*.jar
+
+#2 Stage de teste
+unit_Test:
+  image: maven:3.5.2-jdk-8
+  stage: test
+  tags:
+    - runner01
+  script:
+    - echo -e "\n Teste unitário. \n"
+    - mvn $MAVEN_CLI_OPTS test
+    - cat target/site/jacoco/index.html
+```
 
 <!-- Explicar a prática de "taggear" as imagens. -->
 
