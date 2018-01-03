@@ -1,10 +1,12 @@
-# Gitlab + CI = GitlabCI
+# Gitlab CI/CD
 
-## Um poderoso repositório de códigos e Continuous Integration
+## Um poderoso repositório de códigos, Continuous Integration e Deployment
 
-Todos nós da comunidade de desenvolvedores conhecemos várias plataformas de repositórios e Continuous Integration, cada uma com seus devidos destaques, e boa parte do mercado acaba selecionando uma plataforma para cada um deles (repositório e CI), fazendo com que haja um trabalho a mais para que a integração entre esses 2 estejam completas e bem refinadas para poderem ser utilizadas pelo seus times.
+Todos nós da comunidade de desenvolvedores conhecemos várias plataformas de repositórios e Continuous Integration, cada uma com seus devidos destaques, e boa parte do mercado acaba selecionando uma plataforma para cada um deles (repositório, CI e CD), fazendo com que haja um trabalho a mais para que a integração entre esses 2 (ou até 3) estejam completas e bem refinadas para poderem ser utilizadas pelo seus times.
 
-Mas porque não usar uma ferramenta que una esses 2 serviços?
+Mas porque não usar uma plataforma que possua todos esses serviços em um só ambiente? Essa é a proposta do [Gitlab Continuous Integration & Deployment](https://about.gitlab.com/features/gitlab-ci-cd/). Um _Plataform as a Service_ (PaaS) em que você pode _comitar_ o seu código, controlar a versão, _code reviews_, testes de integração, _builds_, _deployments_.
+
+![Workflow CI/CD](Images/cicd_pipeline_infograph.png)
 
 ### Montando seu próprio Gitlab CI com Docker
 
@@ -55,6 +57,12 @@ networks:
  DockerLAN:
   driver: bridge
 ```
+
+
+
+<!-- Explicar a prática de "taggear" as imagens. -->
+
+<!-- Colocar explicação de cada passo da execução acima. -->
 
 !
 
@@ -274,8 +282,3 @@ Caso queira acompanhar o terminal sendo executado clique no botão `Running` e d
 ![Terminal Gitlab](Images/gitlab_terminal.png)
 
 E é isso pessoal. No `.gitlab-ci.yml` ainda podem ser adicionados muitos outros stages e funções. A Gitlab possui uma documentação bem detalhada com todas os recursos que podem ser utilizados no .yml e a deixo disponibilizada através [desse link](https://docs.gitlab.com/ce/ci/yaml/README.html).
-
-
-<!-- Explicar a prática de "taggear" as imagens. -->
-
-<!-- Colocar explicação de cada passo da execução acima. -->
