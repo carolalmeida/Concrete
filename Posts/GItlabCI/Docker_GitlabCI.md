@@ -66,15 +66,37 @@ Agora que temos nosso ```docker-compose.yml``` criado, ainda na pasta do projeto
 
 ![Status](Images/gitlab_starting.png)
 
-Aguarde mais alguns minutos para que todo serviço seja configurado e execute mais uma vez comando do ```ls``` para conferir se o status do contâiner está como ```(healthy)``` (pode demorar em torno de 10 minutos). Quando estiver ```healthy``` abra o seu navegador e digite ```localhost:80```, sendo 80 a porta que foi exposta para acesso. Caso você tenha utilizado outra porta e não lembra qual, no terminal execute o ```docker container ls``` e veja a porta exposta, conforme no destaque da imagem abaixo:
+Aguarde mais alguns minutos para que todo serviço seja configurado e execute mais uma vez comando do `ls` para conferir se o status do contâiner está como `(healthy)` (pode demorar em torno de 10 minutos).
 
-![Porta de Acesso](Images/port_expose.png)
+Enquanto o serviço é iniciado, vamos adicionar o host do Gitlab em nosso hosts conhecidos para facilitar o nosso acesso. Abra o terminal e digite o comando do docker para pegarmos o IP do container Gitlab_CI
+
+```docker
+docker container inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' Gitlab_CI
+```
+
+Ele irá retornar o IP do contâiner. Grave-o e agora digite
+
+```terminal
+sudo vim /etc/hosts
+```
+
+Dentro desse arquivo adicione o IP e o host `gitlab.docker` conforme o exemplo abaixo:
+
+```hosts
+127.0.0.1       localhost
+172.0.0.1       outro.host
+172.18.0.2      gitlab.docker
+```
+
+Salve o arquivo. Agora vamos aguardar o contâiner ficar `healthy` para acessá-lo.
+
+Quando estiver `healthy` abra o seu navegador e digite `gitlab.docker/`
 
 ## Primeiro acesso ao Gitlab CE
 
 No seu primeiro acesso ele irá solicitar a nova senha para o usuário "root", digite uma de sua preferência. Logo em seguida ele irá te redirecionar a página de login da plataforma, digite o usuário "root" e a senha que você definiu na página anterior.
 
-Agora que já acessamos nosso Gitlab, precisamos configurar o Gitlab Runner para que possamos começar a fazer oclear upload dos projetos e a brincar com lab. Na parte superior do Gitlab, clique no icone de configuração (exemplo na imagem abaixo)
+Agora que já acessamos nosso Gitlab, precisamos configurar o Gitlab Runner para que possamos começar a fazer o upload dos projetos e a brincar com lab. Na parte superior do Gitlab, clique no icone de configuração (exemplo na imagem abaixo)
 
 ![Acesso as configs do Gitlab CE](Images/config_gitlab.png)
 
@@ -115,7 +137,7 @@ Please enter the gitlab-ci tags for this runner (comma separated):
 runner01
 ```
 
-Após "_taggear_" o Runner, temos de indicar se ele poderá executar jobs não "_taggeados_" e se vamos travar o Runner apenas em 1 projeto. Vamos configurar para que os jobs sem Tags não sejam executados e deixar o runner compartilhado, assim todos os projetos que tiverem com a Tag ```runner01``` configurada, serão executados.
+Após "_taggear_" o Runner, temos de indicar se ele poderá executar jobs não "_taggeados_" e se vamos travar o Runner apenas em 1 projeto. Vamos configurar para que os jobs sem Tags não sejam executados e deixar o runner compartilhado, assim todos os projetos que tiverem com a Tag `runner01``` configurada, serão executados.
 
 ```terminal
 Whether to run untagged build [true/false]
@@ -128,7 +150,7 @@ Assim que essas informações forem adicionadas, o Register irá retornar uma me
 
 E para concluir o registro, vamos indicar qual executor do Runner iremos utilizar e a imagem padrão a ser utilizada. No caso iremos utilizar o executor Docker e a uma imagem do alpine:3.5. Essa imagem padrão será utilizada caso não seja especificada nenhuma na execução do job na pipeline.
 
-O executor Docker permite que você execute cada job em um contâiner separado e isolado com uma imagem pré-definida em seu ```.gitlab-ci.yml```
+O executor Docker permite que você execute cada job em um contâiner separado e isolado com uma imagem pré-definida em seu `.gitlab-ci.yml`
 
 ```bash
 Please enter the executor: docker-ssh, parallels, kubernetes, docker-ssh+machine, docker, shell, ssh, virtualbox, docker+machine:
@@ -143,7 +165,7 @@ Agora retorne ao Gitlab e veja que seu novo Runner está ativo
 
 ![Config Runner CMD](Images/runner_configured.png)
 
-Mas antes de finalizarmos, temos de fazer mais alguns ajustes dentro do Runner para que ele consiga identificar o Gitlab e fazer o pull dos projetos. Acesse o container do Gitlab Runner com o comando ```docker container exec -t -i Gitlab_Runner /bin/bash``` e navegue até a pasta ```/etc/gitlab-runner```. Nela terá o arquivo ```config.toml```, edite ele adicionando o campo ```extra_hosts``` conforme o exemplo abaixo, onde do lado esquerdo é o hostname informado no .gitlab-ci.yml e do lado direito o ip de sua máquina ou alguma outra máquina que o Docker seja o host:
+Mas antes de finalizarmos, temos de fazer mais alguns ajustes dentro do Runner para que ele consiga identificar o Gitlab e fazer o pull dos projetos. Acesse o container do Gitlab Runner com o comando `docker container exec -t -i Gitlab_Runner /bin/bash` e navegue até a pasta `/etc/gitlab-runner`. Nela terá o arquivo `config.toml`, edite ele adicionando o campo `extra_hosts` conforme o exemplo abaixo, onde do lado esquerdo é o hostname informado no .gitlab-ci.yml e do lado direito o ip de sua máquina ou alguma outra máquina que o Docker seja o host:
 
 ```toml
 concurrent = 1
@@ -166,19 +188,19 @@ check_interval = 0
 
 ```
 
-É necessária a configuração desse ```extra_hosts``` se não no momento que o Runner executar o job ele não irá encontrar o container do Gitlab CI informado.
+É necessária a configuração desse `extra_hosts` se não no momento que o Runner executar o job ele não irá encontrar o container do Gitlab CI informado.
 
 Agora que temos o nosso Gitlab CI "de pé" e o Runner está ativo e configurado, bora subir um projeto nele e criarmos nossa pipeline.
 
 Para facilitar o processo, fiz uma cópia de um projeto muito utilizado no Github e reduzi alguns arquivos dele. Acesse o projeto [clicando aqui](https://gitlab.com/cs-leandro-lourenco/spring-petclinic.git) e faça o clone.
 
-Agora acesse a pasta do projeto e remova a pasta .git usando o comando ```rm -r .git``` .
+Agora acesse a pasta do projeto e remova a pasta .git usando o comando `rm -r .git`.
 
 Perfeito, mas antes de subirmos o projeto vamos criar o repositório remoto em nosso Gitlab CI no Docker. Acesse a url criada e na barra superior no canto direito, clique no icone de +, conforme a imagem abaixo:
 
 ![Config Project](Images/config_project.png)
 
-E na seleção que irá abrir, clique em ```New Project```. Dê um nome ao projeto, no caso podemos utilizar o mesmo nome spring-petclinic, e clique no botão ```Create project```. Pronto agora vamos voltar a pasta do projeto Petclinic para conectarmos ao repo remoto e construirmos nossa pipeline como código.
+E na seleção que irá abrir, clique em `New Project`. Dê um nome ao projeto, no caso podemos utilizar o mesmo nome spring-petclinic, e clique no botão `Create project`. Pronto agora vamos voltar a pasta do projeto Petclinic para conectarmos ao repo remoto e construirmos nossa pipeline como código.
 
 Dentro do repo, faça a conexão da pasta com o repositório utilizando os comandos abaixo
 
@@ -192,21 +214,14 @@ git push -u origin master
 
 Pronto! Temos nosso projeto conectado e já com o primeiro commit feito.
 
-Vamos agora a pipeline.
+Vamos agora a nossa pipeline.
 
-O ```.gitlab-ci-yml```
+Crie um arquivo chamado `.gitlab-ci.yml` e dentro dele copie as informações abaixo. Veja que comentei cada stage do processo para um melhor entendimento.
 
 ```yml
 variables:
-  # This will supress any download for dependencies and plugins or upload messages which would clutter the console log.
-  # `showDateTime` will show the passed time in milliseconds. You need to specify `--batch-mode` to make this work.
-
-
+  # Essas variaveis irão impedir o download das dependencias ou plugins que já estiverem no cache do M2.
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
-  
-  # As of Maven 3.3.0 instead of this you may define these options in `.mvn/maven.config` so the same config is used
-  # when running from the command line.
-  # `installAtEnd` and `deployAtEnd` are only effective with recent version of the corresponding plugins.
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
 
 cache:
@@ -242,6 +257,24 @@ unit_Test:
     - mvn $MAVEN_CLI_OPTS test
     - cat target/site/jacoco/index.html
 ```
+
+Após adicionar e salvar essas informações, _comite_ o arquivo no repo do projeto
+
+```terminal
+git add .gitlab-ci.yml
+git commit -m "First CI"
+git push
+```
+Agora acesse o gitlab.docker e vá na área de CI/CD (conforme a imagem mostra abaixo) e veja que temos nossa pipeline já sendo executada.
+
+![Pipeline GitlabCI](Images/gitlab_cicd.png)
+
+Caso queira acompanhar o terminal sendo executado clique no botão `Running` e depois no botão do stage de build e você poderá acompanhar a saída da execução do job
+
+![Terminal Gitlab](Images/gitlab_terminal.png)
+
+E é isso pessoal. No `.gitlab-ci.yml` ainda podem ser adicionados muitos outros stages e funções. A Gitlab possui uma documentação bem detalhada com todas os recursos que podem ser utilizados no .yml e a deixo disponibilizada através [desse link](https://docs.gitlab.com/ce/ci/yaml/README.html).
+
 
 <!-- Explicar a prática de "taggear" as imagens. -->
 
