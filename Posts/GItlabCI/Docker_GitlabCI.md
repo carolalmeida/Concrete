@@ -2,11 +2,53 @@
 
 ## Um poderoso repositório de códigos, Continuous Integration e Deployment
 
+### O que é o Gitlab CI/CD
+
 Todos nós da comunidade de desenvolvedores conhecemos várias plataformas de repositórios e Continuous Integration, cada uma com seus devidos destaques, e boa parte do mercado acaba selecionando uma plataforma para cada um deles (repositório, CI e CD), fazendo com que haja um trabalho a mais para que a integração entre esses 2 (ou até 3) estejam completas e bem refinadas para poderem ser utilizadas pelo seus times.
 
 Mas porque não usar uma plataforma que possua todos esses serviços em um só ambiente? Essa é a proposta do [Gitlab Continuous Integration & Deployment](https://about.gitlab.com/features/gitlab-ci-cd/). Um _Plataform as a Service_ (PaaS) em que você pode _comitar_ o seu código, controlar a versão, _code reviews_, testes de integração, _builds_, _deployments_.
 
+
+
 ![Workflow CI/CD](Images/cicd_pipeline_infograph.png)
+
+### Como ele funciona?
+
+Ele é identico ao Gitlab que nós já conhecemos, um _web application_, com uma API, onde você pode armazenar e gerênciar o seu projeto junto a uma baita interface, "digasse de passage", com todas as funções disponiveis pelo serviço. E para que o serviço de CI/CD funcione é necessário apenas adicionar o Gitlab Runner a sua arquitetura.
+
+O Runner é uma aplicação que roda separadamente e trabalha junto ao Gitlab CI/CD executando os _build_ e _deploy_ das aplicações identificadas. Eles podem ser executados em qualquer sistema operacional (Windows, MacOS, Linux) e também via Docker! Ou seja, para que você possa efetuar todo workflow de CI/CD é necessário ao menos 1 instância do Gitlab CI/CD e 1 Gitlab Runner rodando em um server, seu computador ou até mesmo _dockerizado_.
+
+![Workflow Gitlab](Images/arch-1.jpg)
+
+Com a sua plataforma montada e os serviços rodando, quando o código é _commitado_ o Runner é acionado e procura, dentro do repo, por um arquivo conhecido como `.gitlab-ci.yml`. É nesse arquivo que se encontra todo os jobs a serem executados pelo Gitlab (Pipeline as a Code), que pode variar de acordo com a branch em que ele será executado.
+
+Abaixo um modelo bem simples da estrutura desse .yml
+
+```yaml
+image: ruby:2.1
+services:
+  - postgres
+
+before_script:
+  - bundle install
+
+after_script:
+  - rm secrets
+
+stages:
+  - build
+  - test
+  - deploy
+
+job1:
+  stage: build
+  script:
+    - execute-script-for-job1
+  only:
+    - master
+  tags:
+    - docker
+```
 
 ### Montando seu próprio Gitlab CI com Docker
 
@@ -282,3 +324,13 @@ Caso queira acompanhar o terminal sendo executado clique no botão `Running` e d
 ![Terminal Gitlab](Images/gitlab_terminal.png)
 
 E é isso pessoal. No `.gitlab-ci.yml` ainda podem ser adicionados muitos outros stages e funções. A Gitlab possui uma documentação bem detalhada com todas os recursos que podem ser utilizados no .yml e a deixo disponibilizada através [desse link](https://docs.gitlab.com/ce/ci/yaml/README.html).
+
+Compartilho também alguma das documentações que me ajudaram bastante durante o discovery dessa plataforma :D
+
+[Gitlab CI/CD w/ Docker](https://docs.gitlab.com/omnibus/docker/README.html)<br>
+[Gitlab Runner w/ Docker](https://docs.gitlab.com/runner/install/docker.html)<br>
+[Configurações avançadas do Runner](https://docs.gitlab.com/runner/configuration/advanced-configuration.html)
+
+Qualquer dúvida, deixe-a aqui no campo de comentários que irei responde-los :D
+
+Até o próximo artigo pessoal!
