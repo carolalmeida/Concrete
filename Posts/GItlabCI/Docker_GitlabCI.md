@@ -327,9 +327,9 @@ E é isso pessoal. No `.gitlab-ci.yml` ainda podem ser adicionados muitos outros
 
 Compartilho também alguma das documentações que me ajudaram bastante durante o discovery dessa plataforma :D
 
-[Gitlab CI/CD w/ Docker](https://docs.gitlab.com/omnibus/docker/README.html)<br>
-[Gitlab Runner w/ Docker](https://docs.gitlab.com/runner/install/docker.html)<br>
-[Configurações avançadas do Runner](https://docs.gitlab.com/runner/configuration/advanced-configuration.html)
+* [Gitlab CI/CD w/ Docker](https://docs.gitlab.com/omnibus/docker/README.html)<br>
+* [Gitlab Runner w/ Docker](https://docs.gitlab.com/runner/install/docker.html)<br>
+* [Configurações avançadas do Runner](https://docs.gitlab.com/runner/configuration/advanced-configuration.html)
 
 Qualquer dúvida, deixe-a aqui no campo de comentários que irei responde-los :D
 
