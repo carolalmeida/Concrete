@@ -318,7 +318,7 @@ Caso queira acompanhar o terminal sendo executado clique no botão `Running` e d
 
 E é isso pessoal. No `.gitlab-ci.yml` ainda podem ser adicionados muitos outros stages e funções. A Gitlab possui uma documentação bem detalhada com todas os recursos que podem ser utilizados no .yml e a deixo disponibilizada através [desse link](https://docs.gitlab.com/ce/ci/yaml/README.html).
 
-Compartilho também alguma das documentações que me ajudaram bastante durante o discovery dessa plataforma :D
+Compartilho também alguma das documentações que me ajudaram bastante durante o discovery dessa plataforma e também na evolução desse artigo :D
 
 * [Documentação Gitlab CI/CD](https://docs.gitlab.com/omnibus/README.html)
 * [Documentação Gitlab Runner](https://docs.gitlab.com/runner/)
