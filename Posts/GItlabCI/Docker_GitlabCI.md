@@ -14,7 +14,7 @@ Mas porque não usar uma plataforma que possua todos esses serviços em um só a
 
 ### Como ele funciona?
 
-Ele é identico ao Gitlab que nós já conhecemos, um _web application_, com uma API, onde você pode armazenar e gerênciar o seu projeto junto a uma baita interface, "digasse de passage", com todas as funções disponiveis pelo serviço. E para que o serviço de CI/CD funcione é necessário apenas adicionar o Gitlab Runner a sua arquitetura.
+Ele é idêntico ao Gitlab que nós já conhecemos, um _web application_, com uma API, onde você pode armazenar e gerenciar o seu projeto junto a uma baita interface, "digasse de passage", com todas as funções disponíveis pelo serviço. E para que o serviço de CI/CD funcione é necessário apenas adicionar o Gitlab Runner a sua arquitetura.
 
 O Runner é uma aplicação que roda separadamente e trabalha junto ao Gitlab CI/CD executando os _build_ e _deploy_ das aplicações identificadas. Eles podem ser executados em qualquer sistema operacional (Windows, MacOS, Linux) e também via Docker! Ou seja, para que você possa efetuar todo workflow de CI/CD é necessário ao menos 1 instância do Gitlab CI/CD e 1 Gitlab Runner rodando em um server, seu computador ou até mesmo _dockerizado_.
 
@@ -66,7 +66,7 @@ O download é um pouco demorado. Após a sua conclusão, inicie o download do ru
 docker pull gitlab/gitlab-runner:ubuntu-v10.1.0
 ```
 
-Feito os download vamos iniciar o processo de criação dos contâiners. Crie uma pasta em algum diretório com o nome GitlabCI e dentro dele crie o arquivo ```docker-compose.yml``` e adicione as informações abaixo e salve o arquivo. Essa é a receita que irá subir os contâiners, dar um hostname ao Gitlab CI, configurar a network deles e a persistência nos volumes
+Feito os download vamos iniciar o processo de criação dos containers. Crie uma pasta em algum diretório com o nome GitlabCI e dentro dele crie o arquivo ```docker-compose.yml``` e adicione as informações abaixo e salve o arquivo. Essa é a receita que irá subir os containers, dar um hostname ao Gitlab CI, configurar a network deles e a persistência nos volumes
 
 _Caso não tenha o Docker-Compose em sua máquina, sua instalação e utilização estão disponíveis [aqui](https://docs.docker.com/compose/install/) nessa documentação oficial do Docker. E mais informações sobre o quão "bão" é o Compose, você também pode ler [esse post](https://www.concrete.com.br/2017/12/11/docker-compose-o-que-e-para-que-serve-o-que-come/) em nosso blog._
 
@@ -101,10 +101,10 @@ networks:
 ```
 
 No compose acima ele irá subir a instancia do Gitlab_CI, com uma LAN dedicada a ele, configurando para ser iniciado sempre que a máquina também for iniciada, dar um hostname ao container, liberar a porta 80 para acesso e criar a persistência no volume.<br>
-Logo em seguida ele irá finalizar o processo iniciando o Gitlab Runner, linkando o contâiner na 
+Logo em seguida ele irá finalizar o processo iniciando o Gitlab Runner, linkando o container na 
 LAN do Gitlab_CI, usar o mesmo método de inicialização e criar a persistência no volume
 
-Agora que temos nosso `docker-compose.yml` criado, ainda na pasta do projeto, digit e `docker-compose up -d` e você terá o retorno do compose como OK informando que os contâineres foram criados. Digite `docker container ls` e você verá que o contâiner do Gitlab Runner já está rodando e o do Gitlab CI está sendo iniciado `(health: starting)`, como na imagem abaixo:
+Agora que temos nosso `docker-compose.yml` criado, ainda na pasta do projeto, digit e `docker-compose up -d` e você terá o retorno do compose como OK informando que os containeres foram criados. Digite `docker container ls` e você verá que o container do Gitlab Runner já está rodando e o do Gitlab CI está sendo iniciado `(health: starting)`, como na imagem abaixo:
 
 ![Status](Images/gitlab_starting.png)
 
@@ -114,7 +114,7 @@ Esse processo de inicialização do container do Gitlab CI/CD demora em torno de
 docker container inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' Gitlab_CI
 ```
 
-Ele irá retornar o IP do contâiner. Grave-o e agora digite
+Ele irá retornar o IP do container. Grave-o e agora digite
 
 ```terminal
 sudo vim /etc/hosts
@@ -128,7 +128,7 @@ Dentro desse arquivo adicione o IP e o host `gitlab.docker` conforme o exemplo a
 172.18.0.2      gitlab.docker
 ```
 
-Salve o arquivo. Agora vamos aguardar o contâiner ficar `healthy` para acessá-lo. Digite `docker container ls` e acompanhe a mudança do status
+Salve o arquivo. Agora vamos aguardar o container ficar `healthy` para acessá-lo. Digite `docker container ls` e acompanhe a mudança do status
 
 Quando estiver `healthy` abra o seu navegador e digite `gitlab.docker/`
 
@@ -136,7 +136,7 @@ Quando estiver `healthy` abra o seu navegador e digite `gitlab.docker/`
 
 No seu primeiro acesso ele irá solicitar a nova senha para o usuário "root", digite uma de sua preferência. Logo em seguida ele irá te redirecionar a página de login da plataforma, digite o usuário "root" e a senha que você definiu na página anterior.
 
-Agora que já acessamos nosso Gitlab, precisamos configurar o Gitlab Runner para que possamos começar a fazer o upload dos projetos e a brincar com lab. Na parte superior do Gitlab, clique no icone de configuração (exemplo na imagem abaixo)
+Agora que já acessamos nosso Gitlab, precisamos configurar o Gitlab Runner para que possamos começar a fazer o upload dos projetos e a brincar com lab. Na parte superior do Gitlab, clique no ícone de configuração (exemplo na imagem abaixo)
 
 ![Acesso as configs do Gitlab CE](Images/config_gitlab.png)
 
@@ -144,7 +144,7 @@ E na página de configurações, do lado esquerdo, clique na opção "Runners"
 
 ![Config Runners](Images/config_runner.png)
 
-Ao acessar a página veja que não temos nenhum Runner configurado, então vamos configura-lo também utilizando os comandos via Docker :)
+Ao acessar a página veja que não temos nenhum Runner configurado, então vamos configurá-lo também utilizando os comandos via Docker :)
 
 Abra o terminal e digite:
 
@@ -152,14 +152,14 @@ Abra o terminal e digite:
 docker exec -i -t Gitlab_Runner sudo gitlab-runner register
 ```
 
-Ele irá apresentar a mensagem abaixo dando inicio a configuração do Runner. O primeiro passo é informar a URL do Gitlab, então digite o hostname do serviço como está descito no exemplo abaixo e aperte Enter:
+Ele irá apresentar a mensagem abaixo dando inicio a configuração do Runner. O primeiro passo é informar a URL do Gitlab, então digite o hostname do serviço como está descrito no exemplo abaixo e aperte Enter:
 
 ```terminal
 Please enter the gitlab-ci coordinator URL (e.g. https://gitlab.com/):
 http://gitlab.docker/
 ```
 
-O próximo passo é informar o Registration Token. Para copia-lo, vá na página dos Runners no Gitlab e copie a chave disponivel na tela (exemplo abaixo), cole no terminal e pressione enter:
+O próximo passo é informar o Registration Token. Para copiá-lo, vá na página dos Runners no Gitlab e copie a chave disponível na tela (exemplo abaixo), cole no terminal e pressione enter:
 
 ![Config Runner CMD](Images/config_runner2.png)
 
@@ -170,7 +170,7 @@ Please enter the gitlab-ci description for this runner:
 [ebce76428bsb]: runner_gitlab
 ```
 
-Logo em seguida ele irá soliciar a Tag para esse Runner. É um passo muito importante pois é com essa Tag que você irá utilizar nos jobs de suas pipelines para que eles funcionem corretamente. Pode se usar a opção para que elas funcionem sem ela, mas vamos utiliza-la, já que é um processo mais detalhado e de muita importancia se conhecer. Descreva uma Tag fácil de se identificar, veja o exemplo:
+Logo em seguida ele irá solicitar a Tag para esse Runner. É um passo muito importante pois é com essa Tag que você irá utilizar nos jobs de suas pipelines para que eles funcionem corretamente. Pode se usar a opção para que elas funcionem sem ela, mas vamos utilizá-la, já que é um processo mais detalhado e de muita importância se conhecer. Descreva uma Tag fácil de se identificar, veja o exemplo:
 
 ```terminal
 Please enter the gitlab-ci tags for this runner (comma separated):
@@ -190,7 +190,7 @@ Assim que essas informações forem adicionadas, o Register irá retornar uma me
 
 E para concluir o registro, vamos indicar qual executor do Runner iremos utilizar e a imagem padrão a ser utilizada. No caso iremos utilizar o executor Docker e a uma imagem do alpine:3.5. Essa imagem padrão será utilizada caso não seja especificada nenhuma na execução do job na pipeline.
 
-O executor Docker permite que você execute cada job em um contâiner separado e isolado com uma imagem pré-definida em seu `.gitlab-ci.yml`
+O executor Docker permite que você execute cada job em um container separado e isolado com uma imagem pré-definida em seu `.gitlab-ci.yml`
 
 ```bash
 Please enter the executor: docker-ssh, parallels, kubernetes, docker-ssh+machine, docker, shell, ssh, virtualbox, docker+machine:
@@ -236,7 +236,7 @@ Para facilitar o processo, fiz uma cópia de um projeto muito utilizado no Githu
 
 Agora acesse a pasta do projeto e remova a pasta .git usando o comando `rm -r .git`.
 
-Perfeito, mas antes de subirmos o projeto vamos criar o repositório remoto em nosso Gitlab CI no Docker. Acesse a url criada e na barra superior no canto direito, clique no icone de +, conforme a imagem abaixo:
+Perfeito, mas antes de subirmos o projeto vamos criar o repositório remoto em nosso Gitlab CI no Docker. Acesse a url criada e na barra superior no canto direito, clique no ícone de +, conforme a imagem abaixo:
 
 ![Config Project](Images/config_project.png)
 
@@ -260,7 +260,7 @@ Crie um arquivo chamado `.gitlab-ci.yml` e dentro dele copie as informações ab
 
 ```yml
 variables:
-  # Essas variaveis irão impedir o download das dependencias ou plugins que já estiverem no cache do M2.
+  # Essas variáveis irão impedir o download das dependências ou plugins que já estiverem no cache do M2.
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
 
