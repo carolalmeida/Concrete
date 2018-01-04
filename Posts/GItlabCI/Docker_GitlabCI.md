@@ -1,5 +1,7 @@
 # Gitlab CI/CD
 
+| ![Gitlab CI Logo](Images/logo.png) |
+
 ## Um poderoso repositório de códigos, Continuous Integration e Deployment
 
 ### O que é o Gitlab CI/CD
