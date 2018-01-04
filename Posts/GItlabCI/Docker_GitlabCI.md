@@ -1,6 +1,6 @@
 # Gitlab CI/CD
 
-<p align="center"><img src="Images/logo.png" alt="Gitlab Logo" style="width: 400px;"/></p>
+<p align="center"><img src="Images/logo.png" alt="Gitlab Logo" style="width: 350px;"/></p>
 
 ## Um poderoso repositório de códigos, Continuous Integration e Deployment
 
