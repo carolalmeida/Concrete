@@ -1,6 +1,6 @@
 # Gitlab CI/CD
 
-| ![Gitlab CI Logo](Images/logo.png) |
+<p align="center"><img src="Images/logo.png" alt="Gitlab Logo" style="width: 500px;"/></p>
 
 ## Um poderoso repositório de códigos, Continuous Integration e Deployment
 
@@ -18,7 +18,7 @@ Ele é identico ao Gitlab que nós já conhecemos, um _web application_, com uma
 
 O Runner é uma aplicação que roda separadamente e trabalha junto ao Gitlab CI/CD executando os _build_ e _deploy_ das aplicações identificadas. Eles podem ser executados em qualquer sistema operacional (Windows, MacOS, Linux) e também via Docker! Ou seja, para que você possa efetuar todo workflow de CI/CD é necessário ao menos 1 instância do Gitlab CI/CD e 1 Gitlab Runner rodando em um server, seu computador ou até mesmo _dockerizado_.
 
-![Workflow Gitlab](Images/arch-1.jpg)
+<p align="center"><img src="Images/arch-1.jpg" alt="Gitlab Logo"/></p>
 
 Com a sua plataforma montada e os serviços rodando, quando o código é _commitado_ o Runner é acionado e procura, dentro do repo, por um arquivo conhecido como `.gitlab-ci.yml`. É nesse arquivo que se encontra todo os jobs a serem executados pelo Gitlab (Pipeline as a Code), que pode variar de acordo com a branch em que ele será executado.
 
