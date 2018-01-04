@@ -6,9 +6,7 @@
 
 Todos nós da comunidade de desenvolvedores conhecemos várias plataformas de repositórios e Continuous Integration, cada uma com seus devidos destaques, e boa parte do mercado acaba selecionando uma plataforma para cada um deles (repositório, CI e CD), fazendo com que haja um trabalho a mais para que a integração entre esses 2 (ou até 3) estejam completas e bem refinadas para poderem ser utilizadas pelo seus times.
 
-Mas porque não usar uma plataforma que possua todos esses serviços em um só ambiente? Essa é a proposta do [Gitlab Continuous Integration & Deployment](https://about.gitlab.com/features/gitlab-ci-cd/). Um _Plataform as a Service_ (PaaS) em que você pode _comitar_ o seu código, controlar a versão, _code reviews_, testes de integração, _builds_, _deployments_.
-
-
+Mas porque não usar uma plataforma que possua todos esses serviços em um só ambiente? Essa é a proposta do [Gitlab Continuous Integration & Deployment](https://about.gitlab.com/features/gitlab-ci-cd/). Um _Plataform as a Service_ (PaaS) em que você pode _commitar_ o seu código, controlar a versão, _code reviews_, testes de integração, _builds_, _deployments_.
 
 ![Workflow CI/CD](Images/cicd_pipeline_infograph.png)
 
@@ -57,7 +55,7 @@ Para criar nosso lab iremos utilizar a última versão disponível, a v10.1. Cas
 Agora abra o seu terminal a faça do download da imagem do Gitlab CE (Community Edition)
 
 ```terminal
-docker pull gitlab/gitlab-ce:10.1.4-ce.0  restart: always
+docker pull gitlab/gitlab-ce:10.1.4-ce.0
 ```
 
 O download é um pouco demorado. Após a sua conclusão, inicie o download do runner do GitlabCI com o comando abaixo. Veja que iremos utilizar também a versão 10 do Runner, pois se formos utilizar uma versão diferente do Gitlab CE que baixamos, há grande chances de haver incompatibilidades.
@@ -100,25 +98,15 @@ networks:
   driver: bridge
 ```
 
+No compose acima ele irá subir a instancia do Gitlab_CI, com uma LAN dedicada a ele, configurando para ser iniciado sempre que a máquina também for iniciada, dar um hostname ao container, liberar a porta 80 para acesso e criar a persistência no volume.<br>
+Logo em seguida ele irá finalizar o processo iniciando o Gitlab Runner, linkando o contâiner na 
+LAN do Gitlab_CI, usar o mesmo método de inicialização e criar a persistência no volume
 
-
-<!-- Explicar a prática de "taggear" as imagens. -->
-
-<!-- Colocar explicação de cada passo da execução acima. -->
-
-!
-
-__EXPLICAR OS STEPS DO COMPOSE__ 
-
-!
-
-Agora que temos nosso ```docker-compose.yml``` criado, ainda na pasta do projeto, digit e ```docker-compose up -d``` e você terá o retorno do compose como OK informando que os contâineres foram criados. Digite ```docker container ls``` e você verá que o contâiner do Gitlab Runner já está rodando e o do Gitlab CI está sendo iniciado ```(health: starting)```, como na imagem abaixo:
+Agora que temos nosso `docker-compose.yml` criado, ainda na pasta do projeto, digit e `docker-compose up -d` e você terá o retorno do compose como OK informando que os contâineres foram criados. Digite `docker container ls` e você verá que o contâiner do Gitlab Runner já está rodando e o do Gitlab CI está sendo iniciado `(health: starting)`, como na imagem abaixo:
 
 ![Status](Images/gitlab_starting.png)
 
-Aguarde mais alguns minutos para que todo serviço seja configurado e execute mais uma vez comando do `ls` para conferir se o status do contâiner está como `(healthy)` (pode demorar em torno de 10 minutos).
-
-Enquanto o serviço é iniciado, vamos adicionar o host do Gitlab em nosso hosts conhecidos para facilitar o nosso acesso. Abra o terminal e digite o comando do docker para pegarmos o IP do container Gitlab_CI
+Esse processo de inicialização do container do Gitlab CI/CD demora em torno de 10 minutos então, enquanto o serviço é iniciado, vamos adicionar o host do Gitlab em nosso hosts conhecidos para facilitar o nosso acesso. Abra o terminal e digite o comando do docker para pegarmos o IP do container Gitlab_CI
 
 ```docker
 docker container inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' Gitlab_CI
@@ -138,7 +126,7 @@ Dentro desse arquivo adicione o IP e o host `gitlab.docker` conforme o exemplo a
 172.18.0.2      gitlab.docker
 ```
 
-Salve o arquivo. Agora vamos aguardar o contâiner ficar `healthy` para acessá-lo.
+Salve o arquivo. Agora vamos aguardar o contâiner ficar `healthy` para acessá-lo. Digite `docker container ls` e acompanhe a mudança do status
 
 Quando estiver `healthy` abra o seu navegador e digite `gitlab.docker/`
 
@@ -215,7 +203,7 @@ Agora retorne ao Gitlab e veja que seu novo Runner está ativo
 
 ![Config Runner CMD](Images/runner_configured.png)
 
-Mas antes de finalizarmos, temos de fazer mais alguns ajustes dentro do Runner para que ele consiga identificar o Gitlab e fazer o pull dos projetos. Acesse o container do Gitlab Runner com o comando `docker container exec -t -i Gitlab_Runner /bin/bash` e navegue até a pasta `/etc/gitlab-runner`. Nela terá o arquivo `config.toml`, edite ele adicionando o campo `extra_hosts` conforme o exemplo abaixo, onde do lado esquerdo é o hostname informado no .gitlab-ci.yml e do lado direito o ip de sua máquina ou alguma outra máquina que o Docker seja o host:
+Mas antes de finalizarmos, temos de fazer mais alguns ajustes dentro do Runner para que ele consiga identificar o Gitlab e fazer o pull dos projetos. Acesse o container do Gitlab Runner com o comando `docker container exec -t -i Gitlab_Runner /bin/bash` e navegue até a pasta `/etc/gitlab-runner`. Nela terá o arquivo `config.toml`, edite ele adicionando o campo `extra_hosts` conforme o exemplo abaixo, onde do lado esquerdo é o hostname informado em nosso `docker-compose.yml` e do lado direito o ip de sua máquina ou alguma outra máquina que o Docker seja o host:
 
 ```toml
 concurrent = 1
@@ -308,27 +296,32 @@ unit_Test:
     - cat target/site/jacoco/index.html
 ```
 
-Após adicionar e salvar essas informações, _comite_ o arquivo no repo do projeto
+Após adicionar e salvar essas informações, _commite_ o arquivo no repo do projeto
 
 ```terminal
 git add .gitlab-ci.yml
 git commit -m "First CI"
 git push
 ```
+
 Agora acesse o gitlab.docker e vá na área de CI/CD (conforme a imagem mostra abaixo) e veja que temos nossa pipeline já sendo executada.
 
 ![Pipeline GitlabCI](Images/gitlab_cicd.png)
 
 Caso queira acompanhar o terminal sendo executado clique no botão `Running` e depois no botão do stage de build e você poderá acompanhar a saída da execução do job
 
-![Terminal Gitlab](Images/gitlab_terminal.png)
+![Stages CI/CD](Images/stages_gitlab.png)<center>*Stages do Gitlab sendo executado na Pipeline*</center>
+
+![Terminal Gitlab](Images/gitlab_terminal.png)<center>*Terminal de saída do job no Gitlab CI/CD*</center>
 
 E é isso pessoal. No `.gitlab-ci.yml` ainda podem ser adicionados muitos outros stages e funções. A Gitlab possui uma documentação bem detalhada com todas os recursos que podem ser utilizados no .yml e a deixo disponibilizada através [desse link](https://docs.gitlab.com/ce/ci/yaml/README.html).
 
 Compartilho também alguma das documentações que me ajudaram bastante durante o discovery dessa plataforma :D
 
-* [Gitlab CI/CD w/ Docker](https://docs.gitlab.com/omnibus/docker/README.html)<br>
-* [Gitlab Runner w/ Docker](https://docs.gitlab.com/runner/install/docker.html)<br>
+* [Documentação Gitlab CI/CD](https://docs.gitlab.com/omnibus/README.html)
+* [Documentação Gitlab Runner](https://docs.gitlab.com/runner/)
+* [Gitlab CI/CD w/ Docker](https://docs.gitlab.com/omnibus/docker/README.html)
+* [Gitlab Runner w/ Docker](https://docs.gitlab.com/runner/install/docker.html)
 * [Configurações avançadas do Runner](https://docs.gitlab.com/runner/configuration/advanced-configuration.html)
 
 Qualquer dúvida, deixe-a aqui no campo de comentários que irei responde-los :D
