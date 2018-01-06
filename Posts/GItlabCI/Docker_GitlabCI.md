@@ -1,8 +1,8 @@
-# Conheça o Gitlab Continuous Integration & Deployment
+# Conheça o Gitlab CI
 
 <p align="center"><img src="Images/logo.png" alt="Gitlab Logo" style="width: 400px;"></p>
 
-## Um poderoso repositório de códigos, Continuous Integration e Deployment
+## Uma poderosa plataforma de códigos agora com Continuous Integration & Deployment
 
 ### O que é o Gitlab CI/CD
 
