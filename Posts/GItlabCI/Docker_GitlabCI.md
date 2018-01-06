@@ -1,4 +1,4 @@
-# Gitlab CI/CD
+# Conheça o Gitlab Continuous Integration & Deployment
 
 <p align="center"><img src="Images/logo.png" alt="Gitlab Logo" style="width: 400px;"></p>
 
@@ -76,7 +76,7 @@ services:
  Gitlab_CI:
   container_name: Gitlab_CI
   image: 'gitlab/gitlab-ce:10.1.4-ce.0'
-  networks:
+  networks: 
    - 'DockerLAN'
   restart: always
   hostname: 'gitlab.docker'
