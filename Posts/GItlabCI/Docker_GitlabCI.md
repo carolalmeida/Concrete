@@ -4,6 +4,8 @@
 
 ## Uma poderosa plataforma de códigos agora com Continuous Integration & Deployment
 
+Fala pessoal! Nesse post vou mostrar pra vocês um pouco do que é o Gitlab CI e montar um lab, usando Docker, pra vocês verem o quão boa é essa plataforma e o que a diferencia dos outros serviços.
+
 ### O que é o Gitlab CI/CD
 
 Todos nós da comunidade de desenvolvedores conhecemos várias plataformas de repositórios e Continuous Integration, cada uma com seus devidos destaques, e boa parte do mercado acaba selecionando uma plataforma para cada um deles (repositório, CI e CD), fazendo com que haja um trabalho a mais para que a integração entre esses 2 (ou até 3) estejam completas e bem refinadas para poderem ser utilizadas pelo seus times.
